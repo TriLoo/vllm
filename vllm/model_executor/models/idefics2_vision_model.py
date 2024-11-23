@@ -69,6 +69,9 @@ class Idefics2VisionEmbeddings(nn.Module):
                 pixel_values: torch.FloatTensor,
                 patch_attention_mask: torch.BoolTensor,
                 tgt_sizes: Optional[torch.IntTensor] = None) -> torch.Tensor:
+        # if pixel_values.dim() == 5:
+        #     pixel_values = pixel_values.reshape(-1, *pixel_values.shape[-3:])
+        #     # patch_attention_mask = patch_attention_mask.reshape(-1, *patch_attention_mask.shape[-3:])
         batch_size, _, max_im_h, max_im_w = pixel_values.shape
         patch_embeds = self.patch_embedding(pixel_values)
         embeddings = patch_embeds.flatten(2).transpose(1, 2)
@@ -82,6 +85,7 @@ class Idefics2VisionEmbeddings(nn.Module):
                                         max_nb_patches_h * max_nb_patches_w),
                                   fill_value=0)
 
+        # print('shape of position_ids: ', position_ids.shape)
         for batch_idx, p_attn_mask in enumerate(patch_attention_mask):
 
             if tgt_sizes is not None:
@@ -100,6 +104,8 @@ class Idefics2VisionEmbeddings(nn.Module):
                                               right=True)
             pos_ids = (bucket_coords_h[:, None] * self.num_patches_per_side +
                        bucket_coords_w).flatten()
+            # print('current batch_idx: ', batch_idx)
+            # print('sahpe of current p_attn_mask: ', p_attn_mask.shape)
             position_ids[batch_idx][p_attn_mask.view(-1).cpu()] = pos_ids
         position_ids = position_ids.to(self.position_embedding.weight.device)
         embeddings = embeddings + self.position_embedding(position_ids)

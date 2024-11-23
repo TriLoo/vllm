@@ -347,9 +347,11 @@ class LLMEngine:
             prompt_adapter_config=prompt_adapter_config,
             observability_config=self.observability_config,
         )
+        # print('-------- ')
 
-        if self.model_config.task != "embedding":
-            self._initialize_kv_caches()
+        # if self.model_config.task != "embedding":
+        #     self._initialize_kv_caches()
+        self._initialize_kv_caches()
 
         # If usage stat is enabled, collect relevant info.
         if is_usage_stats_enabled():

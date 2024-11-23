@@ -513,6 +513,7 @@ class LlamaForCausalLM(nn.Module, SupportsLoRA, SupportsPP):
                                 prefix="model")
         if get_pp_group().is_last_rank:
             self.unpadded_vocab_size = config.vocab_size
+            print('---- current unpadded vocab size: ', self.unpadded_vocab_size)
             if lora_config:
                 self.unpadded_vocab_size += lora_config.lora_extra_vocab_size
             self.lm_head = ParallelLMHead(
@@ -538,6 +539,7 @@ class LlamaForCausalLM(nn.Module, SupportsLoRA, SupportsPP):
             self.sampler = Sampler()
         else:
             self.lm_head = PPMissingLayer()
+        # print('shape of llama for causal lm lm_head weight: ', self.lm_head.weight.shape)
         self.make_empty_intermediate_tensors = (
             self.model.make_empty_intermediate_tensors)
 
